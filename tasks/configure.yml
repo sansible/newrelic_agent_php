@@ -1,0 +1,42 @@
+---
+
+- name: Configure New Relic PHP agent
+  become: yes
+  ini_file:
+    dest: "{{ sansible_newrelic_agent_php_ini_paths_base }}"
+    mode: 0644
+    section: "{{ item.section | default(None) }}"
+    option: "{{ item.option }}"
+    value: "{% if item.value == true %}true{% elif item.value == false %}false{% else %}{{ item.value }}{% endif %}"
+  with_items: "{{ sansible_newrelic_agent_php_ini_config_defaults + sansible_newrelic_agent_php_ini_config }}"
+
+- name: Configure New Relic PHP agent labels if set
+  become: yes
+  ini_file:
+    dest: "{{ sansible_newrelic_agent_php_ini_paths_base }}"
+    mode: 0644
+    section: newrelic
+    option: newrelic.labels
+    value: "\"{%- set tmp_list = [] -%}
+              {%- for attribute_key, attribute_value in sansible_newrelic_agent_php_labels.iteritems() -%}
+                {{ tmp_list.append(attribute_key + ':' + attribute_value) }}
+              {%- endfor -%}
+            {{ tmp_list |join(';') }}\""
+  when:
+    - 'sansible_newrelic_agent_php_labels | length > 0'
+
+- name: Enable New Relic PHP agent
+  become: yes
+  file:
+    dest: "{{ item }}"
+    src: "{{ sansible_newrelic_agent_php_ini_paths_base }}"
+    state: link
+  with_items: "{{ sansible_newrelic_agent_php_ini_paths_links }}"
+  when: sansible_newrelic_agent_php_start_on_boot
+
+- name: Start New Relic PHP Daemon if start on boot enabled
+  become: yes
+  service:
+    name: newrelic-daemon
+    state: started
+  when: sansible_newrelic_agent_php_start_on_boot

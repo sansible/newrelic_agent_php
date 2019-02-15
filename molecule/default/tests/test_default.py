@@ -5,13 +5,15 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
 
 
-def test_hosts_file(host):
-    # Assert /etc/hosts exists,...
-    f = host.file('/etc/hosts')
-    assert f.exists
-    # ...is owned by the user root,...
-    assert f.user == 'root'
-    # ...and owned by the group root.
-    assert f.group == 'root'
+def test_packages(host):
+    packages = [
+        'newrelic-daemon', 'newrelic-php5',
+        'newrelic-php5-common',
+    ]
+    for package in packages:
+        assert host.package(package).is_installed
 
-# See http://testinfra.readthedocs.io/ for guidance on writing testinfra tests.
+
+def test_config(host):
+    php_ini = host.file('/etc/php/7.3/mods-available/newrelic.ini')
+    assert 'newrelic.daemon.loglevel = error' in php_ini.content_string

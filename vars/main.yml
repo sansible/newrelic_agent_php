@@ -1,1 +1,20 @@
 ---
+
+sansible_newrelic_agent_php_ini_config_defaults:
+  - option: extension
+    value: newrelic.so
+  - option: newrelic.license
+    section: newrelic
+    value: "{{ sansible_newrelic_agent_php_license_key }}"
+  - option: newrelic.loglevel
+    section: newrelic
+    value: "{{ sansible_newrelic_agent_php_log_level }}"
+  - option: newrelic.appname
+    section: newrelic
+    value: "{{ sansible_newrelic_agent_php_appname_prefix + sansible_newrelic_agent_php_appname }}"
+  - option: newrelic.daemon.loglevel
+    section: newrelic
+    value: "{{ sansible_newrelic_agent_php_log_level }}"
+  - option: newrelic.process_host.display_name
+    section: newrelic
+    value: "{{ sansible_newrelic_agent_php_display_name }}"

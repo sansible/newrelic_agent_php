@@ -1,0 +1,57 @@
+---
+
+- name: Install New Relic PHP dependencies
+  become: yes
+  apt:
+    pkg:
+      - apt-transport-https
+      - apt-utils
+    state: present
+  retries: 2
+  register: sansible_newrelic_agent_php_deps_result
+  until: sansible_newrelic_agent_php_deps_result is succeeded
+
+- name: Ensure New Relic PHP PGP key is known to the server
+  become: yes
+  apt_key:
+    id: "{{ sansible_newrelic_agent_php_apt_key_id }}"
+    keyserver: hkp://keyserver.ubuntu.com:80
+    state: present
+  retries: 2
+  register: sansible_newrelic_agent_php_apt_key_result
+  until: sansible_newrelic_agent_php_apt_key_result is succeeded
+
+- name: Add New Relic PHP APT repository
+  become: yes
+  apt_repository:
+    repo: "{{ sansible_newrelic_agent_php_apt_repo }}"
+    update_cache: yes
+
+- name: Install New Relic PHP agent
+  become: yes
+  apt:
+    pkg:
+      - "newrelic-php5-common={{ sansible_newrelic_agent_php_version }}"
+      - "newrelic-daemon={{ sansible_newrelic_agent_php_version }}"
+      - "newrelic-php5={{ sansible_newrelic_agent_php_version }}"
+    state: present
+  retries: 2
+  register: sansible_newrelic_agent_php_install_result
+  until: sansible_newrelic_agent_php_install_result is succeeded
+
+- name: Disable New Relic PHP agent until enabled
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ sansible_newrelic_agent_php_ini_paths_links }}"
+  when: sansible_newrelic_agent_php_install_result.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Ensure New Relic PHP Daemon service is disabled
+  become: yes
+  service:
+    daemon_reload: "{{ (ansible_service_mgr == 'systemd') | ternary('yes', omit) }}"
+    enabled: no
+    name: newrelic-daemon
