@@ -1,1 +1,11 @@
 ---
+
+- name: Install New Relic agent for PHP
+  include: install.yml
+  tags:
+    - build
+
+- name: Configure New Relic agent for PHP
+  include: configure.yml
+  tags:
+    - configure

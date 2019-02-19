@@ -4,4 +4,20 @@
   hosts: all
 
   roles:
-    - role: newrelic_integration_php
+    - role: sansible.php
+      sansible_php_fpm_bin: php-fpm7.3
+      sansible_php_path_etc: /etc/php/7.3
+      sansible_php_path_fpm_pool: /etc/php/7.3/fpm/pool.d
+      sansible_php_version: php7.3
+
+    - role: newrelic_agent_php
+      sansible_newrelic_agent_php_appname: sansible-newrelic
+      sansible_newrelic_agent_php_ini_config:
+        - option: newrelic.distributed_tracing_enabled
+          section: newrelic
+          value: "true"
+      sansible_newrelic_agent_php_labels:
+        org: sansible
+        role: newrelic
+      sansible_newrelic_agent_php_license_key: 123456789123456789123456789123456789
+      sansible_newrelic_agent_php_start_on_boot: no
