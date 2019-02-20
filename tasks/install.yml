@@ -11,20 +11,28 @@
   register: sansible_newrelic_agent_php_deps_result
   until: sansible_newrelic_agent_php_deps_result is succeeded
 
-- name: Ensure New Relic PHP PGP key is known to the server
+- name: Download New Relic PHP PGP key (works with Bionic behind a proxy)
   become: yes
-  apt_key:
-    id: "{{ sansible_newrelic_agent_php_apt_key_id }}"
-    keyserver: hkp://keyserver.ubuntu.com:80
-    state: present
+  get_url:
+    dest: /usr/local/src/newrelic_php.asc
+    mode: 0644
+    url: "https://{{ sansible_newrelic_agent_php_apt_repo_keyserver }}/pks/lookup?op=get&search=0x{{ sansible_newrelic_agent_php_apt_key_id }}"
   retries: 2
   register: sansible_newrelic_agent_php_apt_key_result
   until: sansible_newrelic_agent_php_apt_key_result is succeeded
 
-- name: Add New Relic PHP APT repository
+- name: Ensures New Relic PHP PGP key is known
+  become: yes
+  apt_key:
+    file: /usr/local/src/newrelic_php.asc
+    id: "{{ sansible_newrelic_agent_php_apt_key_id }}"
+    state: present
+
+- name: Add New Relic PHP Repo
   become: yes
   apt_repository:
     repo: "{{ sansible_newrelic_agent_php_apt_repo }}"
+    state: present
     update_cache: yes
 
 - name: Install New Relic PHP agent
