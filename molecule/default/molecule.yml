@@ -4,8 +4,6 @@ driver:
   name: docker
 
 platforms:
-  - name: newrelic_agent_php-trusty
-    image: ubuntu:trusty
   - name: newrelic_agent_php-xenial
     image: ubuntu:xenial
   - name: newrelic_agent_php-bionic

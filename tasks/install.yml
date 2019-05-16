@@ -16,8 +16,9 @@
   get_url:
     dest: /usr/local/src/newrelic_php.asc
     mode: 0644
-    url: "https://{{ sansible_newrelic_agent_php_apt_repo_keyserver }}/pks/lookup?op=get&search=0x{{ sansible_newrelic_agent_php_apt_key_id }}"
+    url: "{{ sansible_newrelic_agent_php_apt_repo_keyserver }}/pks/lookup?op=get&search=0x{{ sansible_newrelic_agent_php_apt_key_id }}"
   retries: 2
+  delay: 10
   register: sansible_newrelic_agent_php_apt_key_result
   until: sansible_newrelic_agent_php_apt_key_result is succeeded
 
