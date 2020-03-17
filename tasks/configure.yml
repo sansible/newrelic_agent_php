@@ -7,7 +7,7 @@
     mode: 0644
     section: "{{ item.section | default(None) }}"
     option: "{{ item.option }}"
-    value: "{% if item.value == true %}true{% elif item.value == false %}false{% else %}{{ item.value }}{% endif %}"
+    value: "{{ (item.value | type_debug == 'bool') | ternary(item.value | to_json, item.value) }}"
   with_items: "{{ sansible_newrelic_agent_php_ini_config_defaults + sansible_newrelic_agent_php_ini_config }}"
 
 - name: Configure New Relic PHP agent labels if set
