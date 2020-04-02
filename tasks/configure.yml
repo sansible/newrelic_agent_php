@@ -18,7 +18,7 @@
     section: newrelic
     option: newrelic.labels
     value: "\"{%- set tmp_list = [] -%}
-              {%- for attribute_key, attribute_value in sansible_newrelic_agent_php_labels.iteritems() -%}
+              {%- for attribute_key, attribute_value in sansible_newrelic_agent_php_labels.items() -%}
                 {{ tmp_list.append(attribute_key + ':' + attribute_value) }}
               {%- endfor -%}
             {{ tmp_list |join(';') }}\""
